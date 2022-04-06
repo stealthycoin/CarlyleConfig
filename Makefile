@@ -28,3 +28,6 @@ clean:
 
 bump:
 	bumpver update --no-fetch --patch --no-push --commit --tag-commit
+
+bump-dry:
+	bumpver update --no-fetch --patch --no-push --commit --tag-commit --dry
