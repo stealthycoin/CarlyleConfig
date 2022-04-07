@@ -1,6 +1,8 @@
 # CarlyleConfig
 Small Hierarchical Configuration loader
 
+[![PyPI version](https://badge.fury.io/py/carlyleconfig.svg)](https://badge.fury.io/py/carlyleconfig)
+
 # Example Usage
 
 ```python
