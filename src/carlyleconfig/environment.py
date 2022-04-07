@@ -4,6 +4,7 @@ from typing import List
 from carlyleconfig.plugins.base import BasePlugin
 from carlyleconfig.plugins.envvar import EnvVarPlugin
 from carlyleconfig.plugins.constant import ConstantPlugin
+from carlyleconfig.plugins.fileparse import FilePlugin
 from carlyleconfig.key import ConfigKey
 
 
@@ -13,6 +14,7 @@ class ConfigEnvironment:
         default_factory=lambda: [
             EnvVarPlugin(),
             ConstantPlugin(),
+            FilePlugin(),
         ]
     )
     plugins: List[BasePlugin] = field(default_factory=lambda: [])

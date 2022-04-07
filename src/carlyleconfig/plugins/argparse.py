@@ -1,10 +1,14 @@
 import argparse
-from typing import Any, ClassVar, Optional, List, Dict
+import logging
+from typing import Any, ClassVar, Optional, List
 from types import MethodType
 
 from dataclasses import dataclass, field
 from carlyleconfig.plugins.base import BasePlugin
 from carlyleconfig.key import ConfigKey
+
+
+LOG = logging.getLogger(__name__)
 
 
 @dataclass
@@ -26,7 +30,9 @@ class ArgParsePendingProvider:
     def provide(self) -> Any:
         if self.provider is None:
             return None
-        return self.provider.provide()
+        value = self.provider.provide()
+        LOG.debug("Providing: %s", value)
+        return value
 
     def upgrade(self, parser: argparse.ArgumentParser):
         dest = install_arg(parser, self.name, **self.kwargs)
@@ -34,6 +40,7 @@ class ArgParsePendingProvider:
 
 
 def install_arg(parser: argparse.ArgumentParser, *args, **kwargs):
+    LOG.debug("Installing arguments in parser %s, kwargs: %s", args, kwargs)
     argument = parser.add_argument(*args, **kwargs)
     return argument.dest
 
@@ -56,6 +63,7 @@ class ArgParsePlugin(BasePlugin):
     on_bind: List[ArgParsePendingProvider] = field(default_factory=lambda: [])
 
     def bind_parser(self, parser: argparse.ArgumentParser):
+        LOG.debug("Binding parser %s", parser)
         self.parser = parser
         self._capture_parse_args()
 
@@ -67,6 +75,7 @@ class ArgParsePlugin(BasePlugin):
 
         def new_parse_args(*args):
             self.args = parse_args(*args)
+            LOG.debug("Capturing args %s", self.args)
             return self.args
 
         self.parser.parse_args = new_parse_args

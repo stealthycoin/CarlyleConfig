@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from typing import Any, ClassVar
 from types import MethodType
@@ -6,11 +7,15 @@ from carlyleconfig.plugins.base import BasePlugin
 from carlyleconfig.key import ConfigKey
 
 
+LOG = logging.getLogger(__name__)
+
+
 @dataclass
 class ConstantProvider:
     value: Any
 
     def provide(self) -> Any:
+        LOG.debug("Providing: %s", self.value)
         return self.value
 
 

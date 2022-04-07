@@ -1,10 +1,14 @@
 import os
+import logging
 from dataclasses import dataclass, field
 from typing import Any, ClassVar, Dict, Callable, Optional
 from types import MethodType
 
 from carlyleconfig.plugins.base import BasePlugin
 from carlyleconfig.key import ConfigKey
+
+
+LOG = logging.getLogger(__name__)
 
 
 @dataclass
@@ -14,9 +18,13 @@ class EnvVarProvider:
     environ: Dict[str, str] = field(default_factory=lambda: os.environ.copy())
 
     def provide(self) -> Any:
+        LOG.debug("Fetching env var %s", self.value)
         value = self.environ.get(self.value)
+        LOG.debug("Got value: %s", value)
         if value is not None and self.cast is not None:
+            LOG.debug("Casting with %s", self.cast)
             value = self.cast(value)
+        LOG.debug("Providing: %s", value)
         return value
 
 
