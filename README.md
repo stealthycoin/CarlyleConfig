@@ -20,17 +20,16 @@ PARSER_PLUGIN = ArgParsePlugin()
 derive.plugins = [PARSER_PLUGIN]
 
 
-
 @deriveconfig
 class Config:
     # Derive the debug field from the following sources in order:
-    # 1) an argparse argument named --debug. 
+    # 1) an argparse argument named --debug.
     #    Defaults to None if not provided so we can fall through to the next case
     #    if not provided. Uses argparse's store_true action if it is provided so we get a bool value.
     # 2) the EXAMPLE_DEBUG environment variable. The string env var is cast to a bool.
     #    If not present None will be returned, falling through to the next case.
     # 3) a constant value of False, this will always provide a value and should be treated
-    #    as the last fallback case. 
+    #    as the last fallback case.
     debug: bool = (
         derive.field()
         .from_argparse("--debug", action="store_true", default=None)
@@ -42,14 +41,14 @@ class Config:
 def main():
     parser = argparse.ArgumentParser()
     # Binding the parser to the ArgParsePlugin allows it to fill out extra
-    # arguments, and intercept the parse_args() call. 
+    # arguments, and intercept the parse_args() call.
     PARSER_PLUGIN.bind_parser(parser)
 
     # Since we don't have any other arguments we don't need to save the args.
     # the ArgParsePlugin intercepts the call and gets a copy of the parsed args
     # to use when populating the Config object.
     parser.parse_args()
-    
+
     # Instantiating a Config object resolves the derive chains into concrete values.
     # Explicit overrides can be provided as well, such as Config(debug=True).
     config = Config()
@@ -62,7 +61,7 @@ if __name__ == "__main__":
 ```
 
 ```bash
-$ python example.py
+$ python samples/example.py
 DEBUG: False
 $ EXAMPLE_DEBUG=1 python samples/example.py
 DEBUG: True
