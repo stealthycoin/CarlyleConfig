@@ -3,7 +3,6 @@ import argparse
 import pytest
 
 from carlyleconfig.plugins import ArgParsePlugin
-from carlyleconfig.plugins.argparse import ArgParseProvider
 from carlyleconfig.plugins.argparse import wrapper
 from carlyleconfig.key import ConfigKey
 
@@ -27,7 +26,7 @@ def test_plugin():
 
 
 def test_plugin_injection():
-    key = ConfigKey
+    key = ConfigKey()
     parser = FakeParser()
     plugin = ArgParsePlugin(parser)
     plugin.inject_factory_method(key)
