@@ -19,11 +19,19 @@ class ConfigKey:
     _cached: Optional[Any] = None
     _resolved: bool = False
 
-    def resolve(self) -> Any:
+    def resolve(self, only_providers: List[str] = None) -> Any:
         if self._resolved is True:
             return self._cached
         LOG.debug("Resolving ConfigKey value for %s", self.name)
         for provider in self.providers:
+            if only_providers:
+                if provider.__class__.__name__ not in only_providers:
+                    LOG.debug(
+                        "Skipping %s not in %s",
+                        provider.__class__.__name__,
+                        only_providers,
+                    )
+                    continue
             LOG.debug("Trying provider %s", provider.__class__.__name__)
             value = provider.provide()
             if value is not None:

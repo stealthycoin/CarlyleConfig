@@ -28,3 +28,19 @@ def test_config_program(args, env, expected):
     )
     loaded = json.loads(p.stdout)
     assert loaded == expected
+
+
+def test_key_program():
+    path = os.path.join(os.path.dirname(__file__), "key.py")
+    p = subprocess.run(
+        [sys.executable, path],
+        env={},
+        encoding="utf-8",
+        capture_output=True,
+    )
+    loaded = p.stdout.strip().split("\n")
+    assert loaded == [
+        "['foo', 'baz']",
+        "['foo', 'bar']",
+        "['bar', 'baz']",
+    ]
