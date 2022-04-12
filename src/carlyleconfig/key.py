@@ -20,7 +20,7 @@ class ConfigKey:
     _resolved: bool = False
 
     def resolve(self, only_providers: List[str] = None) -> Any:
-        if self._resolved is True:
+        if self._resolved is True and not only_providers:
             return self._cached
         LOG.debug("Resolving ConfigKey value for %s", self.name)
         for provider in self.providers:
@@ -36,6 +36,8 @@ class ConfigKey:
             value = provider.provide()
             if value is not None:
                 LOG.debug("%s resolved to %s", self.name, value)
+                if only_providers:
+                    return value
                 self._cached = value
                 break
         self._resolved = True
