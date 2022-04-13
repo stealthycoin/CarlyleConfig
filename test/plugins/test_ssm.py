@@ -44,21 +44,25 @@ def test_plugin_injection():
 
 
 @pytest.mark.parametrize(
-    "prefix,name,params,expected",
+    "prefix,name,params,cast,expected",
     [
-        ("/prefix/", "foo", {"/prefix/foo": "foovalue"}, "foovalue"),
-        ("", "/prefix/foo", {"/prefix/foo": "foovalue"}, "foovalue"),
-        ("/prefix/", "bar", {"/prefix/foo": "foovalue"}, None),
-        ("", "foo", {"/prefix/foo": "foovalue"}, None),
+        ("/prefix/", "foo", {"/prefix/foo": "foovalue"}, None, "foovalue"),
+        ("", "/prefix/foo", {"/prefix/foo": "foovalue"}, None, "foovalue"),
+        ("/prefix/", "bar", {"/prefix/foo": "foovalue"}, None, None),
+        ("", "foo", {"/prefix/foo": "foovalue"}, None, None),
+        ("/prefix/", "foo", {"/prefix/foo": ""}, bool, False),
+        ("/prefix/", "foo", {"/prefix/foo": "1"}, bool, True),
+        ("/prefix/", "foo", {"/prefix/foo": "true"}, bool, True),
+        ("/prefix/", "foo", {}, bool, None),
     ],
 )
-def test_provider(prefix, name, params, expected):
+def test_provider(prefix, name, params, cast, expected):
     client = FakeClient(
         {"Parameters": [{"Name": k, "Value": v} for k, v in params.items()]}
     )
     key = ConfigKey()
     plugin = SSMPlugin(prefix, client=client)
     plugin.inject_factory_method(key)
-    key.from_ssm_parameter(name)
+    key.from_ssm_parameter(name, cast=cast)
     provider = key.providers[0]
     assert provider.provide() == expected

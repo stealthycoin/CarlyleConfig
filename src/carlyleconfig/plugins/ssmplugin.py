@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass, field
-from typing import Any, ClassVar, Dict, List, Optional, Protocol
+from typing import Any, ClassVar, Dict, List, Optional, Protocol, Callable
 from types import MethodType
 
 from carlyleconfig.plugins.base import BasePlugin
@@ -18,18 +18,25 @@ class ParameterFetcher(Protocol):
 class SSMProvider:
     name: str
     plugin: "SSMPlugin"
+    cast: Optional[Callable[[str], Any]] = None
 
     def __post_init__(self):
         self.plugin.add_name(self.name)
 
     def provide(self) -> Optional[str]:
-        LOG.debug("Providing: %s", self.plugin.fullname(self.name))
-        return self.plugin.value_for_name(self.name)
+        value = self.plugin.value_for_name(self.name)
+        if value is not None and self.cast is not None:
+            LOG.debug("Casting with %s", self.cast)
+            value = self.cast(value)
+        LOG.debug("Providing: %s", value)
+        return value
 
 
 def wrapper(plugin: "SSMPlugin"):
-    def with_ssm_parameter(self, name: str) -> ConfigKey:
-        self.providers.append(SSMProvider(name, plugin))
+    def with_ssm_parameter(
+        self, name: str, cast: Optional[Callable[[str], Any]]
+    ) -> ConfigKey:
+        self.providers.append(SSMProvider(name, plugin, cast=cast))
         return self
 
     return with_ssm_parameter
