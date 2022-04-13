@@ -34,7 +34,7 @@ class SSMProvider:
 
 def wrapper(plugin: "SSMPlugin"):
     def with_ssm_parameter(
-        self, name: str, cast: Optional[Callable[[str], Any]]
+        self, name: str, cast: Optional[Callable[[str], Any]] = None
     ) -> ConfigKey:
         self.providers.append(SSMProvider(name, plugin, cast=cast))
         return self

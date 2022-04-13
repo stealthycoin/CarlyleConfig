@@ -63,6 +63,9 @@ def test_provider(prefix, name, params, cast, expected):
     key = ConfigKey()
     plugin = SSMPlugin(prefix, client=client)
     plugin.inject_factory_method(key)
-    key.from_ssm_parameter(name, cast=cast)
+    args = {}
+    if cast is not None:
+        args["cast"] = cast
+    key.from_ssm_parameter(name, **args)
     provider = key.providers[0]
     assert provider.provide() == expected
