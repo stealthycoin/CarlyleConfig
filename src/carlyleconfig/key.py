@@ -15,6 +15,7 @@ class Provider(Protocol):
 @dataclass
 class ConfigKey:
     name: str = ""
+    sensitive: bool = False
     providers: List[Provider] = field(default_factory=lambda: [])
     _cached: Optional[Any] = None
     _resolved: bool = False

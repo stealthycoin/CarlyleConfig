@@ -6,6 +6,9 @@ import json
 import pytest
 
 
+from carlyleconfig import deriveconfig, derive
+
+
 @pytest.mark.parametrize(
     "args,env,expected",
     [
@@ -44,3 +47,24 @@ def test_key_program():
         "['foo', 'bar']",
         "['bar', 'baz']",
     ]
+
+
+def test_repr():
+    @deriveconfig
+    class Config:
+        foo: str = derive.field().from_constant("foo")
+        bar: str = derive.field().from_constant("bar")
+
+    config = Config()
+    value = str(config)
+    assert value == "{'bar': 'bar', 'foo': 'foo'}"
+
+
+def test_sensitive_field():
+    @deriveconfig
+    class Config:
+        secret: str = derive.field(sensitive=True).from_constant("secret")
+
+    config = Config()
+    value = str(config)
+    assert value == "{'secret': '*****'}"

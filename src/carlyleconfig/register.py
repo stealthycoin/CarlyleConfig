@@ -1,4 +1,5 @@
 import logging
+import pprint
 
 LOG = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ def register(Cls):
     _attach_init(Cls, fields)
     _attach_constructors(Cls)
     _attach_key_filter(Cls, fields)
+    _attach_repr(Cls, fields)
 
 
 def _attach_names(fields):
@@ -66,3 +68,20 @@ def filter_factory(fields):
 
 def _attach_key_filter(Cls, fields):
     setattr(Cls, "keys", filter_factory(fields))
+
+
+def _repr_factory(fields):
+    def __repr__(self):
+        return pprint.pformat(
+            {
+                name: getattr(self, name) if not field.sensitive else "*****"
+                for name, field in fields.items()
+            },
+            indent=4,
+        )
+
+    return __repr__
+
+
+def _attach_repr(Cls, fields):
+    setattr(Cls, "__repr__", _repr_factory(fields))

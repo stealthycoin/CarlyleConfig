@@ -19,8 +19,8 @@ class ConfigEnvironment:
     )
     plugins: List[BasePlugin] = field(default_factory=lambda: [])
 
-    def field(self) -> ConfigKey:
-        key = ConfigKey()
+    def field(self, sensitive=False) -> ConfigKey:
+        key = ConfigKey(sensitive=sensitive)
         self._inject_plugin_methods(self.default_plugins, key)
         self._inject_plugin_methods(self.plugins, key)
         return key
