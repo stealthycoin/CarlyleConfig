@@ -3,8 +3,11 @@ import argparse
 import pytest
 
 from carlyleconfig.plugins import ArgParsePlugin
+from carlyleconfig.plugins.ssmplugin import SSMPlugin
 from carlyleconfig.plugins.argparse import wrapper
 from carlyleconfig.key import ConfigKey
+from carlyleconfig import deriveconfig
+from carlyleconfig.environment import ConfigEnvironment
 
 
 class FakeParser:
@@ -72,3 +75,33 @@ def test_provider(param, extra, args, expected):
     parser.parse_args(args)
     provider = key.providers[0]
     assert provider.provide() == expected
+
+
+def test_argparse_auto_help():
+    parser = argparse.ArgumentParser()
+    environment = ConfigEnvironment()
+    plugin = ArgParsePlugin(update_help=True)
+    environment.plugins = [
+        plugin,
+        SSMPlugin("/prefix/"),
+    ]
+
+    @deriveconfig
+    class Config:
+        value = (
+            environment.field()
+            .from_argparse("--value", help="Falls back to: ")
+            .from_env_var("VALUE")
+            .from_ssm_parameter("value")
+            .from_file("path.txt")
+            .from_constant("default value")
+        )
+
+    plugin.bind_parser(parser)
+    assert parser._actions[1].help == (
+        "Falls back to: "
+        "environment variable VALUE, "
+        "AWS SSM Parameter /prefix/value, "
+        "file path.txt, "
+        "defaults to default value"
+    )

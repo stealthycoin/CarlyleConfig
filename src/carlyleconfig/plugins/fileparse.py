@@ -23,6 +23,10 @@ class FileProvider:
     parser: Callable[[str], Any] = identity
     selector: Callable[[Any], Any] = identity
 
+    @property
+    def description(self):
+        return f"file {self.filename}"
+
     def provide(self) -> Any:
         path = self.filename
         if isinstance(self.filename, ConfigKey):

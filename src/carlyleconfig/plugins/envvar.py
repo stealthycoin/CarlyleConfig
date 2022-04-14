@@ -17,6 +17,10 @@ class EnvVarProvider:
     cast: Optional[Callable[[str], Any]] = None
     environ: Dict[str, str] = field(default_factory=lambda: os.environ.copy())
 
+    @property
+    def description(self):
+        return f"environment variable {self.value}"
+
     def provide(self) -> Any:
         LOG.debug("Fetching env var %s", self.value)
         value = self.environ.get(self.value)

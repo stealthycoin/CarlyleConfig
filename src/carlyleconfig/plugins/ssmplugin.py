@@ -23,6 +23,10 @@ class SSMProvider:
     def __post_init__(self):
         self.plugin.add_name(self.name)
 
+    @property
+    def description(self):
+        return f"AWS SSM Parameter {self.plugin.prefix}{self.name}"
+
     def provide(self) -> Optional[str]:
         value = self.plugin.value_for_name(self.name)
         if value is not None and self.cast is not None:

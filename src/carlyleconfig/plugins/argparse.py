@@ -21,11 +21,18 @@ class ArgParseProvider:
 
 
 class ArgParsePendingProvider:
-    def __init__(self, plugin: "ArgParsePlugin", name: str, **kwargs):
+    _RESERVED_KWARGS = ("update_help",)
+
+    def __init__(self, plugin: "ArgParsePlugin", name: str, key: ConfigKey, **kwargs):
         self.plugin = plugin
         self.name = name
+        self.key = key
         self.provider: Optional[ArgParseProvider] = None
         self.kwargs = kwargs
+
+    @property
+    def description(self):
+        return f"argparse argument {self.name}"
 
     def provide(self) -> Any:
         if self.provider is None:
@@ -35,8 +42,32 @@ class ArgParsePendingProvider:
         return value
 
     def upgrade(self, parser: argparse.ArgumentParser):
-        dest = install_arg(parser, self.name, **self.kwargs)
+        args = {k: v for k, v in self.kwargs.items() if k not in self._RESERVED_KWARGS}
+        if self._should_update_help():
+            self._append_help(args)
+        dest = install_arg(parser, self.name, **args)
         self.provider = ArgParseProvider(dest, self.plugin)
+
+    def _should_update_help(self):
+        if self.kwargs.get("update_help") is not None:
+            return self.kwargs.get("update_help")
+        return self.plugin.update_help
+
+    def _append_help(self, args):
+        extra_help = self._generate_extra_help()
+        if "help" not in args:
+            args["help"] = ""
+        args["help"] += f"{extra_help}"
+
+    def _generate_extra_help(self):
+        if self not in self.key.providers:
+            # This is the case where this provider is not in it's
+            # owning key's provider list. This should only be possible
+            # in test scenarios.
+            return ""
+        providers = self.key.providers[self.key.providers.index(self) + 1 :]
+        value = ", ".join(p.description for p in providers)
+        return value
 
 
 def install_arg(parser: argparse.ArgumentParser, *args, **kwargs):
@@ -47,7 +78,7 @@ def install_arg(parser: argparse.ArgumentParser, *args, **kwargs):
 
 def wrapper(plugin: "ArgParsePlugin"):
     def with_argparse(self, name, **kwargs) -> ConfigKey:
-        provider = ArgParsePendingProvider(plugin, name, **kwargs)
+        provider = ArgParsePendingProvider(plugin, name, self, **kwargs)
         plugin.install_provider(provider)
         self.providers.append(provider)
         return self
@@ -59,6 +90,7 @@ def wrapper(plugin: "ArgParsePlugin"):
 class ArgParsePlugin(BasePlugin):
     factory_name: ClassVar[str] = "argparse"
     parser: Optional[argparse.ArgumentParser] = None
+    update_help: bool = False
     args: Optional[argparse.Namespace] = None
     on_bind: List[ArgParsePendingProvider] = field(default_factory=lambda: [])
 

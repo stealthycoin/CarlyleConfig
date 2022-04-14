@@ -8,7 +8,7 @@ from carlyleconfig.plugins import ArgParsePlugin
 # this gives us access to the derive.field().with_argparse(...) method.
 # The with_constant and with_env_var methods are plugins that are loaded
 # by default since they are so simple.
-PARSER_PLUGIN = ArgParsePlugin()
+PARSER_PLUGIN = ArgParsePlugin(update_help=True)
 derive.plugins = [PARSER_PLUGIN]
 
 

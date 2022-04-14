@@ -14,6 +14,10 @@ LOG = logging.getLogger(__name__)
 class ConstantProvider:
     value: Any
 
+    @property
+    def description(self):
+        return f"defaults to {self.value}"
+
     def provide(self) -> Any:
         LOG.debug("Providing: %s", self.value)
         return self.value
