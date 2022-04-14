@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 
 class ParameterFetcher(Protocol):
     def get_parameters(self, Names: List[str]) -> Dict[str, Any]:
-        pass
+        ...
 
 
 @dataclass
@@ -48,6 +48,7 @@ def wrapper(plugin: "SSMPlugin"):
 
 @dataclass
 class SSMPlugin(BasePlugin):
+    _MAX_SSM_NAMES: ClassVar[int] = 10
     prefix: str = ""
     client: Optional[ParameterFetcher] = None
     factory_name: ClassVar[str] = "ssm_parameter"
@@ -76,11 +77,20 @@ class SSMPlugin(BasePlugin):
             import boto3  # type: ignore
 
             self.client = boto3.client("ssm")  # type: ParameterFetcher
-        result = self.client.get_parameters(
-            Names=[self.fullname(name) for name in self.names]
-        )
-        LOG.debug("Fetched: %s", result)
-        return {param["Name"]: param["Value"] for param in result["Parameters"]}
+        values = {}
+        for names in self._name_chunk(self.names, self._MAX_SSM_NAMES):
+            result = self.client.get_parameters(
+                Names=[self.fullname(name) for name in names]
+            )
+            LOG.debug("Fetched: %s", result)
+            values.update(
+                {param["Name"]: param["Value"] for param in result["Parameters"]}
+            )
+        return values
+
+    def _name_chunk(self, names: List[str], n: int):
+        for i in range(0, len(names), n):
+            yield names[i : i + n]
 
     def inject_factory_method(self, key: ConfigKey) -> ConfigKey:
         name = f"from_{self.factory_name}"
