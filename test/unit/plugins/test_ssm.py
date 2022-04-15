@@ -3,6 +3,7 @@ import string
 import pytest
 
 from carlyleconfig.plugins import SSMPlugin
+from carlyleconfig.plugins.ssmplugin import SSMProvider
 from carlyleconfig.key import ConfigKey
 
 
@@ -28,6 +29,7 @@ def test_plugin():
     plugin = SSMPlugin("/prefix/", client=client)
 
     assert plugin.factory_name == "ssm_parameter"
+    assert plugin.provider_name == SSMProvider.__name__
 
     plugin.add_name("foo")
     plugin.add_name("bar")

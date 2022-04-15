@@ -44,6 +44,10 @@ def with_env_var(
 class EnvVarPlugin(BasePlugin):
     factory_name: ClassVar[str] = "env_var"
 
+    @property
+    def provider_name(self) -> str:
+        return "EnvVarProvider"
+
     def inject_factory_method(self, key: ConfigKey) -> ConfigKey:
         name = f"from_{self.factory_name}"
         setattr(key, name, MethodType(with_env_var, key))

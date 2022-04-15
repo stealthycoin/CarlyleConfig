@@ -32,6 +32,10 @@ def with_constant(self, value: Any) -> ConfigKey:
 class ConstantPlugin(BasePlugin):
     factory_name: ClassVar[str] = "constant"
 
+    @property
+    def provider_name(self) -> str:
+        return "ConstantProvider"
+
     def inject_factory_method(self, key: ConfigKey) -> ConfigKey:
         name = f"from_{self.factory_name}"
         setattr(key, name, MethodType(with_constant, key))

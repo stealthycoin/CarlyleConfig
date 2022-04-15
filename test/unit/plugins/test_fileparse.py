@@ -14,6 +14,7 @@ from carlyleconfig.key import ConfigKey
 def test_plugin_name():
     plugin = FilePlugin()
     assert plugin.factory_name == "file"
+    assert plugin.provider_name == FileProvider.__name__
 
 
 def test_plugin_injection():

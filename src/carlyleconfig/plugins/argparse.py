@@ -5,14 +5,14 @@ from types import MethodType
 
 from dataclasses import dataclass, field
 from carlyleconfig.plugins.base import BasePlugin
-from carlyleconfig.key import ConfigKey
+from carlyleconfig.key import ConfigKey, Provider
 
 
 LOG = logging.getLogger(__name__)
 
 
 @dataclass
-class ArgParseProvider:
+class ArgParseProvider(Provider):
     name: str
     plugin: "ArgParsePlugin"
 
@@ -20,7 +20,7 @@ class ArgParseProvider:
         return getattr(self.plugin.args, self.name)
 
 
-class ArgParsePendingProvider:
+class ArgParsePendingProvider(Provider):
     _RESERVED_KWARGS = ("update_help",)
 
     def __init__(self, plugin: "ArgParsePlugin", name: str, key: ConfigKey, **kwargs):
@@ -93,6 +93,10 @@ class ArgParsePlugin(BasePlugin):
     update_help: bool = False
     args: Optional[argparse.Namespace] = None
     on_bind: List[ArgParsePendingProvider] = field(default_factory=lambda: [])
+
+    @property
+    def provider_name(self) -> str:
+        return "ArgParsePendingProvider"
 
     def bind_parser(self, parser: argparse.ArgumentParser):
         LOG.debug("Binding parser %s", parser)

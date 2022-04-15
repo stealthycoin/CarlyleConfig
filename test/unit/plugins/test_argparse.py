@@ -3,6 +3,7 @@ import argparse
 import pytest
 
 from carlyleconfig.plugins import ArgParsePlugin
+from carlyleconfig.plugins.argparse import ArgParsePendingProvider
 from carlyleconfig.plugins.ssmplugin import SSMPlugin
 from carlyleconfig.plugins.argparse import wrapper
 from carlyleconfig.key import ConfigKey
@@ -25,6 +26,7 @@ def test_plugin():
     parser = FakeParser()
     plugin = ArgParsePlugin(parser)
     assert plugin.factory_name == "argparse"
+    assert plugin.provider_name == ArgParsePendingProvider.__name__
     assert plugin.args is None
 
 

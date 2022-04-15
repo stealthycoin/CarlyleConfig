@@ -8,6 +8,7 @@ from carlyleconfig.key import ConfigKey
 def test_plugin():
     plugin = EnvVarPlugin()
     assert plugin.factory_name == "env_var"
+    assert plugin.provider_name == EnvVarProvider.__name__
 
 
 def test_plugin_injection():

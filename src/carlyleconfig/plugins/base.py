@@ -11,3 +11,7 @@ class BasePlugin(ABC):
 
     def inject_factory_method(self, key: ConfigKey):
         raise NotImplementedError("inject_factory_method")
+
+    @property
+    def provider_name(self) -> str:
+        raise NotImplementedError("provider_name")

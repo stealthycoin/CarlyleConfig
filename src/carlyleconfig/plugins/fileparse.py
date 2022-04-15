@@ -61,6 +61,10 @@ class FilePlugin(BasePlugin):
     _cache: Dict[Tuple[str, Any], Any] = field(default_factory=lambda: {})
     osutils: OSUtils = field(default_factory=lambda: OSUtils())
 
+    @property
+    def provider_name(self) -> str:
+        return "FileProvider"
+
     def read_file(self, path: str, parser: Callable[[str], Any]) -> Any:
         if (path, parser) not in self._cache:
             LOG.debug("%s not in cache, trying to load", (path, parser))

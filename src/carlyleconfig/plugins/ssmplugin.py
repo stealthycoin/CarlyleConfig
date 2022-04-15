@@ -55,6 +55,10 @@ class SSMPlugin(BasePlugin):
     names: List[str] = field(default_factory=lambda: [])
     cache: Optional[Dict[str, str]] = None
 
+    @property
+    def provider_name(self) -> str:
+        return "SSMProvider"
+
     def set_client(self, client: ParameterFetcher) -> None:
         self.client = client
 

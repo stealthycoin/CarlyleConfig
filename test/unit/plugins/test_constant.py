@@ -6,6 +6,7 @@ from carlyleconfig.plugins.constant import ConstantProvider
 def test_plugin():
     plugin = ConstantPlugin()
     assert plugin.factory_name == "constant"
+    assert plugin.provider_name == ConstantProvider.__name__
 
 
 def test_plugin_injection():
