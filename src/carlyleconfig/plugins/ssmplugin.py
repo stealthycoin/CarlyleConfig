@@ -10,7 +10,7 @@ LOG = logging.getLogger(__name__)
 
 
 class ParameterFetcher(Protocol):
-    def get_parameters(self, Names: List[str]) -> Dict[str, Any]:
+    def get_parameters(self, Names: List[str], WithDecryption: bool) -> Dict[str, Any]:
         ...
 
 
@@ -84,7 +84,8 @@ class SSMPlugin(BasePlugin):
         values = {}
         for names in self._name_chunk(self.names, self._MAX_SSM_NAMES):
             result = self.client.get_parameters(
-                Names=[self.fullname(name) for name in names]
+                Names=[self.fullname(name) for name in names],
+                WithDecryption=True,
             )
             LOG.debug("Fetched: %s", result)
             values.update(

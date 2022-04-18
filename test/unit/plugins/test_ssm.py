@@ -12,7 +12,8 @@ class FakeClient:
         self.recorded = []
         self.result = result
 
-    def get_parameters(self, Names):
+    def get_parameters(self, Names, WithDecryption):
+        assert WithDecryption is True
         self.recorded.append(Names)
         return self.result
 
