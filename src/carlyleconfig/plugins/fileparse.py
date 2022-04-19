@@ -1,9 +1,12 @@
 import os
+import json
 import logging
 
 from dataclasses import dataclass, field
 from typing import Any, ClassVar, Union, Dict, Callable, Tuple, cast
 from types import MethodType
+
+import jmespath as jp
 
 from carlyleconfig.plugins.base import BasePlugin
 from carlyleconfig.key import ConfigKey
@@ -55,6 +58,16 @@ def wrapper(plugin: "FilePlugin"):
     return with_file
 
 
+def json_wrapper(plugin: "FilePlugin"):
+    def with_json_file(self, filename: str, jmespath: str) -> ConfigKey:
+        parser = json.loads
+        selector = jp.compile(jmespath).search
+        self.providers.append(FileProvider(plugin, filename, parser, selector))
+        return self
+
+    return with_json_file
+
+
 @dataclass
 class FilePlugin(BasePlugin):
     factory_name: ClassVar[str] = "file"
@@ -83,3 +96,4 @@ class FilePlugin(BasePlugin):
     def inject_factory_method(self, key: ConfigKey):
         name = f"from_{self.factory_name}"
         setattr(key, name, MethodType(wrapper(self), key))
+        setattr(key, 'from_json_file', MethodType(json_wrapper(self), key))

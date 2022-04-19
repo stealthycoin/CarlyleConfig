@@ -43,7 +43,7 @@ class Config:
         derive.field()
         .from_argparse("--debug", action="store_true", default=None)
         .from_env_var("EXAMPLE_DEBUG", cast=bool)
-        .from_file(filepath, parser=json.loads, selector=lambda x: x.get("DEBUG"))
+        .from_json_file(filepath, jmespath='DEBUG')
         .from_constant(False)
     )
 
