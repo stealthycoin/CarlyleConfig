@@ -96,4 +96,4 @@ class FilePlugin(BasePlugin):
     def inject_factory_method(self, key: ConfigKey):
         name = f"from_{self.factory_name}"
         setattr(key, name, MethodType(wrapper(self), key))
-        setattr(key, 'from_json_file', MethodType(json_wrapper(self), key))
+        setattr(key, "from_json_file", MethodType(json_wrapper(self), key))

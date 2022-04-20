@@ -22,6 +22,7 @@ def test_plugin_injection():
     plugin = FilePlugin()
     plugin.inject_factory_method(key)
     assert hasattr(key, "from_file")
+    assert hasattr(key, "from_json_file")
 
 
 @dataclass
@@ -98,3 +99,23 @@ def test_provider(plugin, selector, expected):
         value = provider.provide()
         assert value == expected
         assert plugin.record == [(os.path.abspath("filename"), provider.parser)]
+
+
+@pytest.mark.parametrize(
+    "osutils,jmespath,expected",
+    [
+        (json.dumps({"foo": "bar"}), "foo", "bar"),
+        (json.dumps({"foo": "bar"}), "badkey", None),
+        (json.dumps({"root": {"nested": "value"}}), "root.nested", "value"),
+        (json.dumps({"list": ["foo", "bar", "baz"]}), "list[0]", "foo"),
+        (json.dumps({"list": ["foo", "bar", "baz"]}), "list[1]", "bar"),
+        (json.dumps({"list": ["foo", "bar", "baz"]}), "list[2]", "baz"),
+    ],
+    indirect=["osutils"],
+)
+def test_from_json_file(osutils, jmespath, expected):
+    key = ConfigKey()
+    plugin = FilePlugin(osutils=osutils)
+    plugin.inject_factory_method(key)
+    result = key.from_json_file("test", jmespath=jmespath)
+    assert result.resolve() == expected
