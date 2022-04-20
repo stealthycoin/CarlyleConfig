@@ -1,5 +1,4 @@
 import argparse
-import json
 
 from carlyleconfig import deriveconfig, derive
 from carlyleconfig.plugins import ArgParsePlugin

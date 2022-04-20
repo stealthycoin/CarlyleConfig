@@ -79,7 +79,6 @@ indirection of allowing config to change where the config file is loaded from.
 
 ```python
 import argparse
-import json
 
 from carlyleconfig import deriveconfig, derive
 from carlyleconfig.plugins import ArgParsePlugin
@@ -95,7 +94,6 @@ derive.plugins = [PARSER_PLUGIN]
 
 @deriveconfig
 class Config:
-	# First load the path to the config file.
     # Derive the filepath field from the first non-None source below:
     # 1) The command line argument --config-path. If not provided it will be
     #    None falling through to the next case.
@@ -115,16 +113,17 @@ class Config:
     # 2) the EXAMPLE_DEBUG environment variable. The string env var is cast to a bool.
     #    If not present None will be returned, falling through to the next case.
     # 3) A file named filepath. filepath is a reference to the prior config key in this class.
-    #    Since it is loaded first we can use a reference to it here as if it were a concrete value.
-    #    Once the file is loaded it will use the json.loads function to parse the file. And the
-    #    selector function lambda x: x.get("DEBUG") to select out a value from the parsed data.
+    #    Since it is loaded first we can ues a reference to it here as if it were a concrete value.
+    #    Once the file is read it will be parsed as json by the from_json_file method. Finally
+	#    the object will be searched using the "DEBUG" jmespath expression, and the result of
+	#    that is returned.
     # 4) a constant value of False, this will always provide a value and should be treated
     #    as the last fallback case.
     debug: bool = (
         derive.field()
         .from_argparse("--debug", action="store_true", default=None)
         .from_env_var("EXAMPLE_DEBUG", cast=bool)
-        .from_file(filepath, parser=json.loads, selector=lambda x: x.get("DEBUG"))
+        .from_json_file(filepath, jmespath='DEBUG')
         .from_constant(False)
     )
 
@@ -146,8 +145,7 @@ def main():
     parser.parse_args()
 
     # Instantiating a Config object resolves the derive chains into concrete values.
-    # Explicit overrides can be provided as well, such as
-	# Config(filepath='path/override/config.json').
+    # Explicit overrides can be provided as well, such as Config(debug=True).
     config = Config()
     print(f"DEBUG: {config.debug}")
     print(f'config file contents: "{config.raw_config_file}"')
