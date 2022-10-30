@@ -4,10 +4,6 @@ from carlyleconfig import deriveconfig, derive
 from carlyleconfig.plugins import ArgParsePlugin
 
 
-parser_plugin = ArgParsePlugin()
-derive.plugins = [parser_plugin]
-
-
 @deriveconfig
 class Config:
     foo: bool = (
@@ -25,7 +21,7 @@ class Config:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser_plugin.bind_parser(parser)
+    derive.get_plugin(ArgParsePlugin).bind_parser(parser)
 
     print(Config.keys(has_provider=["ArgParsePendingProvider"]))
     print(Config.keys(has_provider=["EnvVarProvider"]))

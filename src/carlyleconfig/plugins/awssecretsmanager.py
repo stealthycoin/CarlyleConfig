@@ -76,7 +76,7 @@ def wrapper(plugin: "SecretsManagerPlugin"):
 
 
 @dataclass
-class SecretsManagerPlugin:
+class SecretsManagerPlugin(BasePlugin):
 
     client: Optional[SecretFetcher] = None
     factory_name: ClassVar[str] = "secrets_manager"

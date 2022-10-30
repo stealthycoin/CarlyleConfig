@@ -83,10 +83,7 @@ def test_argparse_auto_help():
     parser = argparse.ArgumentParser()
     environment = ConfigEnvironment()
     plugin = ArgParsePlugin(update_help=True)
-    environment.plugins = [
-        plugin,
-        SSMPlugin("/prefix/"),
-    ]
+    environment.add_plugin(SSMPlugin("/prefix/"))
 
     @deriveconfig
     class Config:
@@ -99,7 +96,7 @@ def test_argparse_auto_help():
             .from_constant("default value")
         )
 
-    plugin.bind_parser(parser)
+    environment.get_plugin(ArgParsePlugin).bind_parser(parser)
     assert parser._actions[1].help == (
         "Falls back to: "
         "environment variable VALUE, "

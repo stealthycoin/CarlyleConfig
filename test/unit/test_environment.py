@@ -10,18 +10,20 @@ class FakeParser:
 def test_default_environment():
     env = ConfigEnvironment()
     field = env.field()
-    assert hasattr(field, "from_constant")
-    assert hasattr(field, "from_env_var")
+    from_methods = {f for f in dir(field) if "from_" in f}
+    assert from_methods == {
+        "from_constant",
+        "from_env_var",
+        "from_argparse",
+        "from_file",
+        "from_json_file",
+    }
 
 
 def test_add_plugin():
     parser = FakeParser()
-    env = ConfigEnvironment(
-        plugins=[
-            ArgParsePlugin(parser),
-        ]
-    )
+    env = ConfigEnvironment(plugins={})
+    env.add_plugin(ArgParsePlugin())
     field = env.field()
-    assert hasattr(field, "from_constant")
-    assert hasattr(field, "from_env_var")
     assert hasattr(field, "from_argparse")
+    assert not hasattr(field, "from_constant")

@@ -5,10 +5,6 @@ from carlyleconfig import deriveconfig, derive
 from carlyleconfig.plugins import ArgParsePlugin
 
 
-parser_plugin = ArgParsePlugin()
-derive.plugins = [parser_plugin]
-
-
 @deriveconfig
 class Config:
     debug: bool = (
@@ -21,7 +17,7 @@ class Config:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser_plugin.bind_parser(parser)
+    derive.get_plugin(ArgParsePlugin).bind_parser(parser)
     parser.parse_args()
     config = Config()
     print(json.dumps(vars(config)))

@@ -15,3 +15,7 @@ class BasePlugin(ABC):
     @property
     def provider_name(self) -> str:
         raise NotImplementedError("provider_name")
+
+    @classmethod
+    def name(cls):
+        return cls.__name__

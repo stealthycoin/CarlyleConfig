@@ -7,9 +7,7 @@ import pytest
 @pytest.fixture
 def run_fixture():
     def run(filename, args, env):
-        print(filename, args, env)
         path = os.path.join(os.path.dirname(__file__), "fixtures", filename)
-        print(path)
         p = subprocess.run(
             [sys.executable, path] + args,
             env=env,

@@ -4,20 +4,13 @@ from carlyleconfig import deriveconfig, derive
 from carlyleconfig.plugins import ArgParsePlugin
 
 
-# Load the ArgParsePlugin and attach it to the default derive object.
-# this gives us access to the derive.field().with_argparse(...) method.
-# The with_constant and with_env_var methods are plugins that are loaded
-# by default since they are so simple.
-PARSER_PLUGIN = ArgParsePlugin(update_help=True)
-derive.plugins = [PARSER_PLUGIN]
-
-
 @deriveconfig
 class Config:
     # Derive the debug field from the following sources in order:
     # 1) an argparse argument named --debug.
     #    Defaults to None if not provided so we can fall through to the next case
-    #    if not provided. Uses argparse's store_true action if it is provided so we get a bool value.
+    #    if not provided. Uses argparse's store_true action if it is provided so we get
+    # a bool value.
     # 2) the EXAMPLE_DEBUG environment variable. The string env var is cast to a bool.
     #    If not present None will be returned, falling through to the next case.
     # 3) a constant value of False, this will always provide a value and should be treated
@@ -34,7 +27,7 @@ def main():
     parser = argparse.ArgumentParser()
     # Binding the parser to the ArgParsePlugin allows it to fill out extra
     # arguments, and intercept the parse_args() call.
-    PARSER_PLUGIN.bind_parser(parser)
+    derive.get_plugin(ArgParsePlugin).bind_parser(parser)
 
     # Since we don't have any other arguments we don't need to save the args.
     # the ArgParsePlugin intercepts the call and gets a copy of the parsed args
