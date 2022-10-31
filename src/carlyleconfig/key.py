@@ -14,13 +14,27 @@ class Provider(Protocol):
 
 @dataclass
 class ConfigKey:
+    """A class used as a placeholder in a Configuration object.
+
+    Once the configuration object is instantiated all ConfigKey
+    members will call their resolve method to fetch the actual
+    value."""
+
     name: str = ""
+    """What is this"""
     sensitive: bool = False
     providers: List[Provider] = field(default_factory=lambda: [])
     _cached: Optional[Any] = None
     _resolved: bool = False
 
     def resolve(self, only_providers: List[str] = None) -> Any:
+        """Resolves a ConfigKey to a value.
+
+        A ConfigKey value is resolved by looping through all the
+        providers and returning the first non-None value provided.
+
+        One a key has been resolved once, that value is cached and
+        the lookup is avoided the next time."""
         if self._resolved is True and not only_providers:
             return self._cached
         LOG.debug("Resolving ConfigKey value for %s", self.name)
