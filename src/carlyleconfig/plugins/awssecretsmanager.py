@@ -13,8 +13,7 @@ LOG = logging.getLogger(__name__)
 class SecretFetcher(Protocol):
     exceptions: Any
 
-    def get_secret_value(self, SecretId: str) -> Dict[str, Any]:
-        ...
+    def get_secret_value(self, SecretId: str) -> Dict[str, Any]: ...
 
 
 @dataclass

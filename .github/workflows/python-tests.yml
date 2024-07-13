@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         make install-build
-        make install-build
+        make install-dev
 
 
     - name: Build

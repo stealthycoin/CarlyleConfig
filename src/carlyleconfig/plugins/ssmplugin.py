@@ -10,8 +10,9 @@ LOG = logging.getLogger(__name__)
 
 
 class ParameterFetcher(Protocol):
-    def get_parameters(self, Names: List[str], WithDecryption: bool) -> Dict[str, Any]:
-        ...
+    def get_parameters(
+        self, Names: List[str], WithDecryption: bool
+    ) -> Dict[str, Any]: ...
 
 
 @dataclass
