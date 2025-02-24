@@ -15,7 +15,7 @@ class ConstantProvider:
     value: Any
 
     @property
-    def description(self):
+    def description(self) -> str:
         return f"defaults to {self.value}"
 
     def provide(self) -> Any:
@@ -23,7 +23,7 @@ class ConstantProvider:
         return self.value
 
 
-def with_constant(self, value: Any) -> ConfigKey:
+def with_constant(self: ConfigKey, value: Any) -> ConfigKey:
     self.providers.append(ConstantProvider(value))
     return self
 
@@ -36,7 +36,6 @@ class ConstantPlugin(BasePlugin):
     def provider_name(self) -> str:
         return "ConstantProvider"
 
-    def inject_factory_method(self, key: ConfigKey) -> ConfigKey:
+    def inject_factory_method(self, key: ConfigKey) -> None:
         name = f"from_{self.factory_name}"
         setattr(key, name, MethodType(with_constant, key))
-        return key

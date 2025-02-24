@@ -82,7 +82,7 @@ def test_provider(param, extra, args, expected):
 def test_argparse_auto_help():
     parser = argparse.ArgumentParser()
     environment = ConfigEnvironment()
-    plugin = ArgParsePlugin(update_help=True)
+    ArgParsePlugin(update_help=True)
     environment.add_plugin(SSMPlugin("/prefix/"))
 
     @deriveconfig

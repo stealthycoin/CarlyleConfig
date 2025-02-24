@@ -21,9 +21,10 @@ def test_default_environment():
 
 
 def test_add_plugin():
-    parser = FakeParser()
+    FakeParser()
     env = ConfigEnvironment(plugins={})
     env.add_plugin(ArgParsePlugin())
     field = env.field()
+    print(dir(field))
     assert hasattr(field, "from_argparse")
     assert not hasattr(field, "from_constant")

@@ -54,7 +54,7 @@ def osutils(request):
 )
 def test_plugin(osutils, parser, expected):
     plugin = FilePlugin(osutils=osutils)
-    if type(expected) == type:
+    if type(expected) is type:
         with pytest.raises(expected):
             plugin.read_file("filename", parser)
     else:
@@ -92,7 +92,7 @@ def plugin(request):
 )
 def test_provider(plugin, selector, expected):
     provider = FileProvider(plugin=plugin, filename="filename", selector=selector)
-    if type(expected) == type:
+    if type(expected) is type:
         with pytest.raises(expected):
             provider.provide()
     else:

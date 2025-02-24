@@ -1,18 +1,24 @@
 import os
 import json
 import logging
+from typing import Any, ClassVar, Union, Dict, Callable, Tuple, TypeVar
 
 from dataclasses import dataclass, field
-from typing import Any, ClassVar, Union, Dict, Callable, Tuple, cast
 from types import MethodType
 
-import jmespath as jp
+import jmespath as jp  # type: ignore
 
 from carlyleconfig.plugins.base import BasePlugin
 from carlyleconfig.key import ConfigKey
 from carlyleconfig.utils import OSUtils
 
 LOG = logging.getLogger(__name__)
+
+T = TypeVar("T")
+U = TypeVar("U")
+
+ParserType = Callable[[str | bytes], T]
+SelectorType = Callable[[T], U]
 
 
 def identity(x: Any) -> Any:
@@ -23,19 +29,18 @@ def identity(x: Any) -> Any:
 class FileProvider:
     plugin: "FilePlugin"
     filename: Union[str, ConfigKey]
-    parser: Callable[[str], Any] = identity
-    selector: Callable[[Any], Any] = identity
+    parser: ParserType[str] = identity
+    selector: SelectorType[str, Any] = identity
 
     @property
-    def description(self):
+    def description(self) -> str:
         return f"file {self.filename}"
 
     def provide(self) -> Any:
         path = self.filename
         if isinstance(self.filename, ConfigKey):
             path = self.filename.resolve()
-        path = cast(str, path)
-        path = os.path.abspath(os.path.expanduser(path))
+        path = os.path.abspath(os.path.expanduser(str(path)))
         LOG.debug("Fetching file %s", path)
         content = self.plugin.read_file(path, self.parser)
         LOG.debug("Parsed type: %s content:\n%s", type(content), content)
@@ -46,20 +51,23 @@ class FileProvider:
         return selected
 
 
-def wrapper(plugin: "FilePlugin"):
-    def with_file(self, filename: str, parser=None, selector=None) -> ConfigKey:
-        if parser is None:
-            parser = identity
-        if selector is None:
-            selector = identity
+def wrapper(
+    plugin: "FilePlugin",
+) -> Callable[[ConfigKey, str, ParserType[str], SelectorType[str, Any]], ConfigKey]:
+    def with_file(
+        self: ConfigKey,
+        filename: str,
+        parser: ParserType[str] = identity,
+        selector: SelectorType[str, Any] = identity,
+    ) -> ConfigKey:
         self.providers.append(FileProvider(plugin, filename, parser, selector))
         return self
 
     return with_file
 
 
-def json_wrapper(plugin: "FilePlugin"):
-    def with_json_file(self, filename: str, jmespath: str) -> ConfigKey:
+def json_wrapper(plugin: "FilePlugin") -> Callable[[ConfigKey, str, str], ConfigKey]:
+    def with_json_file(self: ConfigKey, filename: str, jmespath: str) -> ConfigKey:
         parser = json.loads
         selector = jp.compile(jmespath).search
         self.providers.append(FileProvider(plugin, filename, parser, selector))
@@ -71,14 +79,14 @@ def json_wrapper(plugin: "FilePlugin"):
 @dataclass
 class FilePlugin(BasePlugin):
     factory_name: ClassVar[str] = "file"
-    _cache: Dict[Tuple[str, Any], Any] = field(default_factory=lambda: {})
+    _cache: Dict[Tuple[str, ParserType[str]], Any] = field(default_factory=lambda: {})
     osutils: OSUtils = field(default_factory=lambda: OSUtils())
 
     @property
     def provider_name(self) -> str:
         return "FileProvider"
 
-    def read_file(self, path: str, parser: Callable[[str], Any]) -> Any:
+    def read_file(self, path: str, parser: ParserType[str]) -> Any:
         if (path, parser) not in self._cache:
             LOG.debug("%s not in cache, trying to load", (path, parser))
             try:
@@ -93,7 +101,7 @@ class FilePlugin(BasePlugin):
             self._cache[(path, parser)] = content
         return self._cache[(path, parser)]
 
-    def inject_factory_method(self, key: ConfigKey):
+    def inject_factory_method(self, key: ConfigKey) -> None:
         name = f"from_{self.factory_name}"
         setattr(key, name, MethodType(wrapper(self), key))
         setattr(key, "from_json_file", MethodType(json_wrapper(self), key))

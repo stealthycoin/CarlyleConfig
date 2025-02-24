@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import ClassVar
+from typing import ClassVar, Type, Any
 from dataclasses import dataclass
 
 from carlyleconfig.key import ConfigKey
@@ -9,7 +9,7 @@ from carlyleconfig.key import ConfigKey
 class BasePlugin(ABC):
     factory_name: ClassVar[str]
 
-    def inject_factory_method(self, key: ConfigKey):
+    def inject_factory_method(self, key: ConfigKey) -> None:
         raise NotImplementedError("inject_factory_method")
 
     @property
@@ -17,5 +17,5 @@ class BasePlugin(ABC):
         raise NotImplementedError("provider_name")
 
     @classmethod
-    def name(cls):
+    def name(cls: Type[Any]) -> str:
         return cls.__name__

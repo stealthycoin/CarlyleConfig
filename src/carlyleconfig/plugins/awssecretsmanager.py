@@ -1,7 +1,7 @@
 import json
 import logging
-from dataclasses import dataclass, field
-from typing import Any, ClassVar, Dict, List, Optional, Protocol, Callable
+from dataclasses import dataclass
+from typing import Any, ClassVar, Dict, Optional, Protocol, Callable
 from types import MethodType
 
 from carlyleconfig.plugins.base import BasePlugin
@@ -13,7 +13,7 @@ LOG = logging.getLogger(__name__)
 class SecretFetcher(Protocol):
     exceptions: Any
 
-    def get_secret_value(self, SecretId: str) -> Dict[str, Any]: ...
+    def get_secret_value(self, SecretId: str) -> Dict[str, str]: ...
 
 
 @dataclass
@@ -25,8 +25,8 @@ class SecretsManagerProvider:
     require_key: bool = False
 
     @property
-    def description(self):
-        return f"AWS Secrets Manager"
+    def description(self) -> str:
+        return "AWS Secrets Manager"
 
     def provide(self) -> Optional[str]:
         value = self.plugin.get_secret(self.name)
@@ -56,9 +56,13 @@ class SecretsManagerProvider:
         return value
 
 
-def wrapper(plugin: "SecretsManagerPlugin"):
+def wrapper(
+    plugin: "SecretsManagerPlugin",
+) -> Callable[
+    [ConfigKey, str, Optional[str], Optional[Callable[[str], Any]], bool], ConfigKey
+]:
     def with_secrets_manager(
-        self,
+        self: ConfigKey,
         name: str,
         key: Optional[str] = None,
         cast: Optional[Callable[[str], Any]] = None,
@@ -76,7 +80,6 @@ def wrapper(plugin: "SecretsManagerPlugin"):
 
 @dataclass
 class SecretsManagerPlugin(BasePlugin):
-
     client: Optional[SecretFetcher] = None
     factory_name: ClassVar[str] = "secrets_manager"
 
@@ -107,7 +110,6 @@ class SecretsManagerPlugin(BasePlugin):
             LOG.debug("Could not find secret %s", name)
             return None
 
-    def inject_factory_method(self, key: ConfigKey) -> ConfigKey:
+    def inject_factory_method(self, key: ConfigKey) -> None:
         name = f"from_{self.factory_name}"
         setattr(key, name, MethodType(wrapper(self), key))
-        return key

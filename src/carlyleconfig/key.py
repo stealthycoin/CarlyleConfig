@@ -27,7 +27,7 @@ class ConfigKey:
     _cached: Optional[Any] = None
     _resolved: bool = False
 
-    def resolve(self, only_providers: List[str] = None) -> Any:
+    def resolve(self, only_providers: Optional[List[str]] = None) -> Any:
         """Resolves a ConfigKey to a value.
 
         A ConfigKey value is resolved by looping through all the
@@ -35,7 +35,7 @@ class ConfigKey:
 
         One a key has been resolved once, that value is cached and
         the lookup is avoided the next time."""
-        if self._resolved is True and not only_providers:
+        if self._resolved is True and only_providers is None:
             return self._cached
         LOG.debug("Resolving ConfigKey value for %s", self.name)
         for provider in self.providers:

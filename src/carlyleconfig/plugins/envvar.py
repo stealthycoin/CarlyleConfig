@@ -13,12 +13,12 @@ LOG = logging.getLogger(__name__)
 
 @dataclass
 class EnvVarProvider:
-    value: Any
+    value: str
     cast: Optional[Callable[[str], Any]] = None
     environ: Dict[str, str] = field(default_factory=lambda: os.environ.copy())
 
     @property
-    def description(self):
+    def description(self) -> str:
         return f"environment variable {self.value}"
 
     def provide(self) -> Any:
@@ -33,7 +33,7 @@ class EnvVarProvider:
 
 
 def with_env_var(
-    self, name: str, cast: Optional[Callable[[str], Any]] = None
+    self: ConfigKey, name: str, cast: Optional[Callable[[str], Any]] = None
 ) -> ConfigKey:
     provider = EnvVarProvider(name, cast=cast)
     self.providers.append(provider)
@@ -48,7 +48,6 @@ class EnvVarPlugin(BasePlugin):
     def provider_name(self) -> str:
         return "EnvVarProvider"
 
-    def inject_factory_method(self, key: ConfigKey) -> ConfigKey:
+    def inject_factory_method(self, key: ConfigKey) -> None:
         name = f"from_{self.factory_name}"
         setattr(key, name, MethodType(with_env_var, key))
-        return key

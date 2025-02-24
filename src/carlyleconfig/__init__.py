@@ -1,4 +1,5 @@
 import logging
+from typing import Type, Any
 
 from carlyleconfig.register import register
 from carlyleconfig.environment import ConfigEnvironment
@@ -7,7 +8,7 @@ from carlyleconfig.environment import ConfigEnvironment
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
-def deriveconfig(Cls):
+def deriveconfig(Cls: Type[Any]) -> Type[Any]:
     """Decorator to place on configuration class.
 
     Decorate a class to register it as a configuration class with

@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass, field
-from typing import Any, ClassVar, Dict, List, Optional, Protocol, Callable
+from typing import Any, ClassVar, Dict, List, Optional, Protocol, Callable, Generator
 from types import MethodType
 
 from carlyleconfig.plugins.base import BasePlugin
@@ -21,11 +21,11 @@ class SSMProvider:
     plugin: "SSMPlugin"
     cast: Optional[Callable[[str], Any]] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.plugin.add_name(self.name)
 
     @property
-    def description(self):
+    def description(self) -> str:
         return f"AWS SSM Parameter {self.plugin.prefix}{self.name}"
 
     def provide(self) -> Optional[str]:
@@ -37,9 +37,11 @@ class SSMProvider:
         return value
 
 
-def wrapper(plugin: "SSMPlugin"):
+def wrapper(
+    plugin: "SSMPlugin",
+) -> Callable[[ConfigKey, str, Optional[Callable[[str], Any]]], ConfigKey]:
     def with_ssm_parameter(
-        self, name: str, cast: Optional[Callable[[str], Any]] = None
+        self: ConfigKey, name: str, cast: Optional[Callable[[str], Any]] = None
     ) -> ConfigKey:
         self.providers.append(SSMProvider(name, plugin, cast=cast))
         return self
@@ -94,11 +96,10 @@ class SSMPlugin(BasePlugin):
             )
         return values
 
-    def _name_chunk(self, names: List[str], n: int):
+    def _name_chunk(self, names: List[str], n: int) -> Generator[List[str], None, None]:
         for i in range(0, len(names), n):
             yield names[i : i + n]
 
-    def inject_factory_method(self, key: ConfigKey) -> ConfigKey:
+    def inject_factory_method(self, key: ConfigKey) -> None:
         name = f"from_{self.factory_name}"
         setattr(key, name, MethodType(wrapper(self), key))
-        return key

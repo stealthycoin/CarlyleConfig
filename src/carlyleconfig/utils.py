@@ -1,10 +1,8 @@
-from typing import AnyStr
+from typing import cast
 
 
 class OSUtils:
-    def read_file(self, path: str, binary=False) -> AnyStr:
-        mode = "r"
-        if binary:
-            mode += "b"
+    def read_file(self, path: str, binary: bool = False) -> str | bytes:
+        mode = "r" if not binary else "rb"
         with open(path, mode=mode) as f:
-            return f.read()
+            return cast(str | bytes, f.read())

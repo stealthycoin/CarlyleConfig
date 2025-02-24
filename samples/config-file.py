@@ -52,9 +52,7 @@ class Config:
     # Grab the full contents of the config file without any parsing
     # by using the from_file method without any parser/selector.
     # Provide a default of empty string in case the file doesn't exist.
-    raw_config_file: str = (
-        derive.field().from_file(filepath).from_constant("")
-    )
+    raw_config_file: str = derive.field().from_file(filepath).from_constant("")
 
 
 def main():

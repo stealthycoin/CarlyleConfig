@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "carlyleconfig"
+author = {name = "John Carlyle"}
+version = "2022.43"
+description = "Hierarchical config loader"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "License :: OSI Approved :: Apache Software License",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "jmespath>=1.0",
+]
+
+
+[bumpver]
+current_version = "2022.43"
+version_pattern = "YYYY.WW[.PATCH]"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.3.4",
+    "ruff>=0.9.7",
+    "bumpver>=2024.1130",
+    "mypy>=1.14.1",
+    "sphinx==5.3.0",
+]

@@ -10,7 +10,7 @@ def test_plugin():
 
 
 def test_plugin_injection():
-    key = ConfigKey
+    key = ConfigKey()
     plugin = ConstantPlugin()
     plugin.inject_factory_method(key)
     assert hasattr(key, "from_constant")
