@@ -26,7 +26,7 @@ dependencies = [
 
 
 [bumpver]
-current_version = "2025.8"
+current_version = "2025.38"
 version_pattern = "YYYY.WW[.PATCH]"
 
 [tool.uv]
