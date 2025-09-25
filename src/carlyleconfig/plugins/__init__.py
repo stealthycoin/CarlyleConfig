@@ -4,6 +4,7 @@ from carlyleconfig.plugins.envvar import EnvVarPlugin
 from carlyleconfig.plugins.constant import ConstantPlugin
 from carlyleconfig.plugins.ssmplugin import SSMPlugin
 from carlyleconfig.plugins.awssecretsmanager import SecretsManagerPlugin
+from carlyleconfig.plugins.default_factory import DefaultFactoryPlugin
 
 
 __all__ = [
@@ -13,4 +14,5 @@ __all__ = [
     "ConstantPlugin",
     "SSMPlugin",
     "SecretsManagerPlugin",
+    "DefaultFactoryPlugin",
 ]

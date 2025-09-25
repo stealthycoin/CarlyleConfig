@@ -27,7 +27,8 @@ class Config:
     # Derive the debug field from the following sources in order:
     # 1) an argparse argument named --debug.
     #    Defaults to None if not provided so we can fall through to the next case
-    #    if not provided. Uses argparse's store_true action if it is provided so we get a bool value.
+    #    if not provided. Uses argparse's store_true action if it is provided so we get a bool
+    #    value.
     # 2) the EXAMPLE_DEBUG environment variable. The string env var is cast to a bool.
     #    If not present None will be returned, falling through to the next case.
     # 3) a constant value of False, this will always provide a value and should be treated
@@ -109,11 +110,13 @@ class Config:
     # Derive the debug field from the following sources in order:
     # 1) an argparse argument named --debug.
     #    Defaults to None if not provided so we can fall through to the next case
-    #    if not provided. Uses argparse's store_true action if it is provided so we get a bool value.
+    #    if not provided. Uses argparse's store_true action if it is provided so we get a bool
+    #    value.
     # 2) the EXAMPLE_DEBUG environment variable. The string env var is cast to a bool.
     #    If not present None will be returned, falling through to the next case.
     # 3) A file named filepath. filepath is a reference to the prior config key in this class.
-    #    Since it is loaded first we can ues a reference to it here as if it were a concrete value.
+    #    Since it is loaded first we can ues a reference to it here as if it were a concrete
+    #    value.
     #    Once the file is read it will be parsed as json by the from_json_file method. Finally
 	#    the object will be searched using the "DEBUG" jmespath expression, and the result of
 	#    that is returned.

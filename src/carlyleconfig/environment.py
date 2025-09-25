@@ -5,6 +5,7 @@ from carlyleconfig.plugins.envvar import EnvVarPlugin
 from carlyleconfig.plugins.constant import ConstantPlugin
 from carlyleconfig.plugins.fileparse import FilePlugin
 from carlyleconfig.plugins.argparse import ArgParsePlugin
+from carlyleconfig.plugins.default_factory import DefaultFactoryPlugin
 from carlyleconfig.key import ConfigKey
 
 
@@ -18,7 +19,8 @@ class ConfigEnvironment:
     * EnvVarPlugin
     * ConstantPlugin
     * FilePlugin
-    * ArgParsePlugin"""
+    * ArgParsePlugin
+    * DefaultFactoryPlugin"""
 
     plugins: dict[str, BasePlugin] = field(
         default_factory=lambda: {
@@ -26,6 +28,7 @@ class ConfigEnvironment:
             ConstantPlugin.name(): ConstantPlugin(),
             FilePlugin.name(): FilePlugin(),
             ArgParsePlugin.name(): ArgParsePlugin(update_help=True),
+            DefaultFactoryPlugin.name(): DefaultFactoryPlugin(),
         }
     )
 

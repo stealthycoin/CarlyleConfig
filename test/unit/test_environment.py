@@ -17,6 +17,7 @@ def test_default_environment():
         "from_argparse",
         "from_file",
         "from_json_file",
+        "from_default_factory",
     }
 
 
