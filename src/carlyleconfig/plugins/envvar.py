@@ -14,6 +14,7 @@ LOG = logging.getLogger(__name__)
 @dataclass
 class EnvVarProvider:
     value: str
+    sensitive: bool = False
     cast: Optional[Callable[[str], Any]] = None
     environ: Dict[str, str] = field(default_factory=lambda: os.environ.copy())
 
@@ -22,20 +23,20 @@ class EnvVarProvider:
         return f"environment variable {self.value}"
 
     def provide(self) -> Any:
-        LOG.debug("Fetching env var %s", self.value)
+        LOG.debug("Fetching env var '%s'", self.value)
         value = self.environ.get(self.value)
-        LOG.debug("Got value: %s", value)
+        LOG.debug("Got value: %s", value if not self.sensitive else "*****")
         if value is not None and self.cast is not None:
             LOG.debug("Casting with %s", self.cast)
             value = self.cast(value)
-        LOG.debug("Providing: %s", value)
+        LOG.debug("Providing: %s", value if not self.sensitive else "*****")
         return value
 
 
 def with_env_var(
     self: ConfigKey, name: str, cast: Optional[Callable[[str], Any]] = None
 ) -> ConfigKey:
-    provider = EnvVarProvider(name, cast=cast)
+    provider = EnvVarProvider(name, sensitive=self.sensitive, cast=cast)
     self.providers.append(provider)
     return self
 

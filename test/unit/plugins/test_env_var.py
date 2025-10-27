@@ -1,3 +1,4 @@
+import logging
 import pytest
 
 from carlyleconfig.plugins import EnvVarPlugin
@@ -40,3 +41,17 @@ def test_provider(key, cast, expected):
     )
     value = provider.provide()
     assert value == expected
+
+
+def test_does_not_log_sensitive_keys(caplog):
+    caplog.set_level(logging.DEBUG)
+    provider = EnvVarProvider(
+        "key",
+        sensitive=True,
+        cast=None,
+        environ={"key": "secret"},
+    )
+    provider.provide()
+    logs = "\n".join(r[2] for r in caplog.record_tuples)
+    assert "secret" not in logs
+    assert "Providing: *****" in logs
