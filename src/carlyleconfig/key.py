@@ -21,7 +21,6 @@ class ConfigKey:
     value."""
 
     name: str = ""
-    """What is this"""
     sensitive: bool = False
     providers: List[Provider] = field(default_factory=lambda: [])
     _cached: Optional[Any] = None
@@ -50,7 +49,8 @@ class ConfigKey:
             LOG.debug("Trying provider %s", provider.__class__.__name__)
             value = provider.provide()
             if value is not None:
-                LOG.debug("%s resolved to %s", self.name, value)
+                display_value = "*****" if self.sensitive else value
+                LOG.debug("%s resolved to %s", self.name, display_value)
                 if only_providers:
                     return value
                 self._cached = value

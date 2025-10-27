@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from typing import Any, List
 
@@ -39,3 +41,12 @@ def providers():
 def test_resolve(providers, seq, expected):
     actual = ConfigKey(providers=providers(seq)).resolve()
     assert actual == expected
+
+
+def test_does_not_log_sensitive_keys(providers, caplog):
+    caplog.set_level(logging.DEBUG)
+    test_key = ConfigKey(name="test", sensitive=True, providers=providers(["secret"]))
+    test_key.resolve()
+    logs = "\n".join(r[2] for r in caplog.record_tuples)
+    assert "secret" not in logs
+    assert "test resolved to *****"
