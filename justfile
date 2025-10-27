@@ -31,5 +31,9 @@ build:
     uv build
 
 
+publish:
+    uvx twine upload dist/*
+
+
 clean:
     rm -rf dist
