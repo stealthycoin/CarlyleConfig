@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "carlyleconfig"
 author = {name = "John Carlyle"}
-version = "2025.38.1"
+version = "2025.43"
 description = "Hierarchical config loader"
 readme = "README.md"
 classifiers = [
@@ -26,7 +26,7 @@ dependencies = [
 
 
 [bumpver]
-current_version = "2025.38.1"
+current_version = "2025.43"
 version_pattern = "YYYY.WW[.PATCH]"
 serialize = [
     { path = "pyproject.toml", field = "project.version" }
